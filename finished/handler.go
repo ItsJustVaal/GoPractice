@@ -2,12 +2,12 @@ package main
 
 // This goes with the handlerproblem file
 
-import (
-	"log"
-	"net/http"
+// import (
+// 	"log"
+// 	"net/http"
 
-	yaml "gopkg.in/yaml.v3"
-)
+// 	yaml "gopkg.in/yaml.v3"
+// )
 
 // MapHandler will return an http.HandlerFunc (which also
 // implements http.Handler) that will attempt to map any
@@ -15,18 +15,18 @@ import (
 // that each key in the map points to, in string format).
 // If the path is not provided in the map, then the fallback
 // http.Handler will be called instead.
-func mapHandler(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		url := pathsToUrls[r.URL.Path]
+// func mapHandler(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		url := pathsToUrls[r.URL.Path]
 
-		if url != "" {
-			http.Redirect(w, r, url, http.StatusFound)
-			return
-		}
-		
-		fallback.ServeHTTP(w, r)
-	}
-}
+// 		if url != "" {
+// 			http.Redirect(w, r, url, http.StatusFound)
+// 			return
+// 		}
+
+// 		fallback.ServeHTTP(w, r)
+// 	}
+// }
 
 // YAMLHandler will parse the provided YAML and then return
 // an http.HandlerFunc (which also implements http.Handler)
@@ -44,21 +44,21 @@ func mapHandler(pathsToUrls map[string]string, fallback http.Handler) http.Handl
 //
 // See MapHandler to create a similar http.HandlerFunc via
 // a mapping of paths to urls.
-type DATA struct {
-	Path string
-	Url string
-}
+// type DATA struct {
+// 	Path string
+// 	Url string
+// }
 
-func yamlHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
-	var data []DATA
-	if err := yaml.Unmarshal(yml, &data); err != nil {
-		log.Fatal(err.Error())
-	}
+// func yamlHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
+// 	var data []DATA
+// 	if err := yaml.Unmarshal(yml, &data); err != nil {
+// 		log.Fatal(err.Error())
+// 	}
 
-	urlMap := make(map[string]string)
-	for _, item := range data {
-		urlMap[item.Path] = item.Url
-	}
+// 	urlMap := make(map[string]string)
+// 	for _, item := range data {
+// 		urlMap[item.Path] = item.Url
+// 	}
 
-	return mapHandler(urlMap, fallback), nil
-}
+// 	return mapHandler(urlMap, fallback), nil
+// }
