@@ -18,16 +18,41 @@ var page = `<!DOCTYPE html>
 					<title>Choose Your Own Adventure</title>
 				</head>
 				<body>
-					<h1>{{.Title}}</h1>
-					{{range .Paragraphs}}
-					<p>{{.}}</p>
-					{{end}}
-					{{range .Option}}
-					<ul>
-						<li><a href="/{{.Arc}}"></a>{{.Text}}</li>
-					</ul>
-					{{end}}
+					<div class="page">
+						<h1>{{.Title}}</h1>
+						{{range .Paragraphs}}
+							<p>{{.}}</p>
+						{{end}}
+						<ul>
+						{{range .Option}}
+							<li><a href="/{{.Arc}}">{{.Text}}</a></li>
+						{{end}}
+						</ul>
+					</div>
 				</body>
+				<style>
+				h1 {
+					text-align: center;
+					position:relative;
+				}
+				.page {
+					width:80%;
+					max-width:500px;
+					margin:auto;
+					margin-bottom:40px;
+					padding: 80px;
+					padding-top: 5px;
+					padding-bottom: 5px;
+					border: 1px solid black;
+					background: #FFFCF6;
+					box-shadow: 0 10px 6px -6px #777;
+				}
+
+				li {
+					padding: 5px;
+				}
+				
+				</style>
 			</html>`
 
 func init() {
@@ -41,10 +66,21 @@ func makeHandler(s Story) http.Handler {
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := tpl.Execute(w, h.Story["intro"])
-	if err != nil {
-		fmt.Println(err.Error())
+	path := r.URL.Path
+	if path == "/" || path == "/intro" {
+		path = "/intro"
 	}
+	path = path[1:]
+
+	if chapter, ok := h.Story[path]; ok {
+		err := tpl.Execute(w, chapter)
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, "Something went wrong...", http.StatusInternalServerError)
+		}
+		return
+	}
+	http.Error(w, "Chapter Not Found", http.StatusNotFound)
 }
 
 func parseJson(r io.Reader) (Story, error) {
