@@ -1,10 +1,8 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -15,23 +13,16 @@ type Link struct{
 	Text []string
 }
 
+// This is if you want to read from a file instead of a get request
+// func HtmlLinkParsing() []Link {
+// 	file, err := os.Open("")
+// 	if err != nil {
+// 		fmt.Println(err.Error())
+// 	}
+// 	return parse(file)
+// }
 
-func htmlLinkParsing() {
-	htmlToParse := flag.String("html", "./html/ex4.html", "html to read")
-	flag.Parse()
-
-	file, err := os.Open(*htmlToParse)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	allItems := parse(file)
-	for _, item := range allItems {
-		fmt.Println(item.Href)
-		fmt.Println(item.Text)
-	}
-}
-
-func parse(r io.Reader) []Link {
+func Parse(r io.Reader) []Link {
 	doc, err := html.Parse(r)
 	if err != nil {
 		fmt.Println(err.Error())
