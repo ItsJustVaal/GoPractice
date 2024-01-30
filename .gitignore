@@ -2,3 +2,5 @@
 *.exe
 *.csv
 sample
+*.json
+*.yaml
