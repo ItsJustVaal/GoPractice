@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-type Link struct{
+type Link struct {
 	Href string
 	Text []string
 }
@@ -27,7 +27,7 @@ func Parse(r io.Reader) []Link {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	
+
 	links := getLinkNodes(doc)
 	var linkItems []Link
 	for _, item := range links {
@@ -41,7 +41,7 @@ func getLinkNodes(n *html.Node) []*html.Node {
 		return []*html.Node{n}
 	}
 	var nodes []*html.Node
-	for c:= n.FirstChild; c != nil; c = c.NextSibling {
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		nodes = append(nodes, getLinkNodes(c)...)
 	}
 	return nodes
@@ -62,14 +62,14 @@ func buildLinks(n *html.Node) Link {
 func getText(n *html.Node) []string {
 	if n.Type == html.TextNode {
 		finalText := "-" + strings.Join(strings.Fields(n.Data), " ")
-		if finalText == "-"{
+		if finalText == "-" {
 			return []string{}
 		}
 		return []string{finalText}
 	}
 
 	var htmlText []string
-	for c:= n.FirstChild; c != nil; c = c.NextSibling {
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		htmlText = append(htmlText, getText(c)...)
 	}
 	return htmlText
