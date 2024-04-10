@@ -1,35 +1,63 @@
 package deck
 
-var cardVals = [...]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"}
-var cardTypes = [...]string{"Hearts", "Diamonds", "Spades", "Clubs"}
+var cardSymbols = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"}
+var cardVals = []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}
+var cardTypes = []string{"Hearts", "Diamonds", "Spades", "Clubs"}
 
 type Card struct {
-	Value string
-	Type  string
+	Symbol string
+	Value  int
+	Type   string
 }
 
-func New() []Card {
-	var deck []Card
+type Deck struct {
+	Cards []Card
+}
+
+func New() Deck {
+	var deck Deck
 	for _, x := range cardTypes {
-		for i := 0; i < len(cardVals); i++ {
+		for i := 0; i < len(cardSymbols); i++ {
 			newCard := Card{
-				Value: cardVals[i],
-				Type:  x,
+				Symbol: cardSymbols[i],
+				Value:  cardVals[i],
+				Type:   x,
 			}
-			deck = append(deck, newCard)
+			deck.Cards = append(deck.Cards, newCard)
 		}
 	}
 	return deck
 }
 
-func sortDeck() {}
+// func (d *Deck) sortDeck() {}
 
-func compare() {}
+func Compare(firstCard, secondCard Card) Card {
+	if firstCard.Value == secondCard.Value {
+		return Card{
+			Value: firstCard.Value,
+		}
+	}
+	if firstCard.Value > secondCard.Value {
+		return firstCard
+	}
+	if secondCard.Value > firstCard.Value {
+		return secondCard
+	}
+	return Card{}
+}
 
-func shuffle() {}
+// func (d *Deck) shuffle() {}
 
-func addJokers() {}
+func (d *Deck) AddJokers() {
+	for _, x := range cardTypes {
+		d.Cards = append(d.Cards, Card{
+			Symbol: "Joker",
+			Value:  15,
+			Type:   x,
+		})
+	}
+}
 
-func filterCards() {}
+// func (d *Deck) filterCards() {}
 
-func multiDeck() {}
+// func (d *Deck) multiDeck() {}
