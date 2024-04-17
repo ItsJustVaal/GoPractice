@@ -1,63 +1,121 @@
+//go:generate stringer -type=Suit,Rank
+
 package deck
 
-var cardSymbols = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"}
-var cardVals = []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}
-var cardTypes = []string{"Hearts", "Diamonds", "Spades", "Clubs"}
+import (
+	"fmt"
+	"math/rand"
+	"sort"
+	"time"
+)
+
+type Suit uint8
+
+const (
+	Spade Suit = iota
+	Diamond
+	Club
+	Heart
+	Joker // Special Case
+)
+
+var suits = [...]Suit{Spade, Diamond, Club, Heart}
+
+type Rank uint8
+
+const (
+	_ Rank = iota
+	Ace
+	Two
+	Three
+	Four
+	Five
+	Six
+	Seven
+	Eight
+	Nine
+	Ten
+	Jack
+	Queen
+	King
+)
+
+const (
+	minRank = Ace
+	maxRank = King
+)
 
 type Card struct {
-	Symbol string
-	Value  int
-	Type   string
+	Suit Suit
+	Rank Rank
+}
+
+func (c Card) String() string {
+	if c.Suit == Joker {
+		return c.Suit.String()
+	}
+	return fmt.Sprintf("%s of %ss", c.Rank.String(), c.Suit.String())
 }
 
 type Deck struct {
 	Cards []Card
 }
 
-func New() Deck {
-	var deck Deck
-	for _, x := range cardTypes {
-		for i := 0; i < len(cardSymbols); i++ {
-			newCard := Card{
-				Symbol: cardSymbols[i],
-				Value:  cardVals[i],
-				Type:   x,
-			}
-			deck.Cards = append(deck.Cards, newCard)
+func New(opts ...func(Deck) Deck) Deck {
+	var d Deck
+	for _, suit := range suits {
+		for rank := minRank; rank <= maxRank; rank++ {
+			d.Cards = append(d.Cards, Card{Suit: suit, Rank: rank})
 		}
 	}
-	return deck
+	for _, opt := range opts {
+		d = opt(d)
+	}
+
+	return d
 }
 
-// func (d *Deck) sortDeck() {}
+func DefaultSort(d Deck) Deck {
+	sort.Slice(d.Cards, Less(d.Cards))
+	return d
+}
 
-func Compare(firstCard, secondCard Card) Card {
-	if firstCard.Value == secondCard.Value {
-		return Card{
-			Value: firstCard.Value,
+func Sort(less func(cards []Card) func(i, j int) bool) func(d Deck) Deck {
+	return func(d Deck) Deck {
+		sort.Slice(d.Cards, Less(d.Cards))
+		return d
+	}
+}
+
+func Less(cards []Card) func(i, j int) bool {
+	return func(i, j int) bool {
+		return absRank(cards[i]) < absRank(cards[j])
+	}
+}
+
+func absRank(c Card) int {
+	return int(c.Suit)*int(maxRank) + int(c.Rank)
+}
+
+// Shuffle is a simple shuffle func that uses
+// a random perm to make a new slice of shuffled cards
+func Shuffle(cards []Card) []Card {
+	ret := make([]Card, len(cards))
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+	for i, j := range r.Perm(len(cards)) {
+		ret[i] = cards[j]
+	}
+	return ret
+}
+
+func AddJokers(toAdd int) func(d Deck) Deck {
+	return func(d Deck) Deck {
+		for i := 0; i < toAdd; i++ {
+			d.Cards = append(d.Cards, Card{
+				Rank: Rank(i),
+				Suit: Joker,
+			})
 		}
-	}
-	if firstCard.Value > secondCard.Value {
-		return firstCard
-	}
-	if secondCard.Value > firstCard.Value {
-		return secondCard
-	}
-	return Card{}
-}
-
-// func (d *Deck) shuffle() {}
-
-func (d *Deck) AddJokers() {
-	for _, x := range cardTypes {
-		d.Cards = append(d.Cards, Card{
-			Symbol: "Joker",
-			Value:  15,
-			Type:   x,
-		})
+		return d
 	}
 }
-
-// func (d *Deck) filterCards() {}
-
-// func (d *Deck) multiDeck() {}
