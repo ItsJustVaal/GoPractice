@@ -119,3 +119,30 @@ func AddJokers(toAdd int) func(d Deck) Deck {
 		return d
 	}
 }
+
+func Filter(f func(card Card) bool) func(d Deck) Deck {
+	return func(d Deck) Deck {
+		var ret []Card
+		for _, c := range d.Cards {
+			if !f(c) {
+				ret = append(ret, c)
+			}
+		}
+		d.Cards = ret
+		return d
+	}
+}
+
+// AddDeck duplicates all current cards in the deck
+// run this after your first deck is sorted, filtered
+// with how many jokers you want before using this
+func AddDeck(toAdd int) func(Deck) Deck {
+	return func(d Deck) Deck {
+		var ret []Card
+		for i := 0; i < toAdd+1; i++ {
+			ret = append(ret, d.Cards...)
+		}
+		d.Cards = ret
+		return d
+	}
+}
