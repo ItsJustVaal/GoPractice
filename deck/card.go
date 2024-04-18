@@ -71,7 +71,7 @@ func New(opts ...func(Deck) Deck) Deck {
 	for _, opt := range opts {
 		d = opt(d)
 	}
-
+	d.Cards = shuffle(d.Cards)
 	return d
 }
 
@@ -99,7 +99,7 @@ func absRank(c Card) int {
 
 // Shuffle is a simple shuffle func that uses
 // a random perm to make a new slice of shuffled cards
-func Shuffle(cards []Card) []Card {
+func shuffle(cards []Card) []Card {
 	ret := make([]Card, len(cards))
 	r := rand.New(rand.NewSource(time.Now().Unix()))
 	for i, j := range r.Perm(len(cards)) {
