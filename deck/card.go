@@ -57,32 +57,28 @@ func (c Card) String() string {
 	return fmt.Sprintf("%s of %ss", c.Rank.String(), c.Suit.String())
 }
 
-type Deck struct {
-	Cards []Card
-}
-
-func New(opts ...func(Deck) Deck) Deck {
-	var d Deck
+func New(opts ...func([]Card) []Card) []Card {
+	var d []Card
 	for _, suit := range suits {
 		for rank := minRank; rank <= maxRank; rank++ {
-			d.Cards = append(d.Cards, Card{Suit: suit, Rank: rank})
+			d = append(d, Card{Suit: suit, Rank: rank})
 		}
 	}
 	for _, opt := range opts {
 		d = opt(d)
 	}
-	d.Cards = shuffle(d.Cards)
+	d = shuffle(d)
 	return d
 }
 
-func DefaultSort(d Deck) Deck {
-	sort.Slice(d.Cards, Less(d.Cards))
+func DefaultSort(d []Card) []Card {
+	sort.Slice(d, Less(d))
 	return d
 }
 
-func Sort(less func(cards []Card) func(i, j int) bool) func(d Deck) Deck {
-	return func(d Deck) Deck {
-		sort.Slice(d.Cards, Less(d.Cards))
+func Sort(less func(cards []Card) func(i, j int) bool) func(d []Card) []Card {
+	return func(d []Card) []Card {
+		sort.Slice(d, Less(d))
 		return d
 	}
 }
@@ -108,10 +104,10 @@ func shuffle(cards []Card) []Card {
 	return ret
 }
 
-func AddJokers(toAdd int) func(d Deck) Deck {
-	return func(d Deck) Deck {
+func AddJokers(toAdd int) func(d []Card) []Card {
+	return func(d []Card) []Card {
 		for i := 0; i < toAdd; i++ {
-			d.Cards = append(d.Cards, Card{
+			d = append(d, Card{
 				Rank: Rank(i),
 				Suit: Joker,
 			})
@@ -120,15 +116,15 @@ func AddJokers(toAdd int) func(d Deck) Deck {
 	}
 }
 
-func Filter(f func(card Card) bool) func(d Deck) Deck {
-	return func(d Deck) Deck {
+func Filter(f func(card Card) bool) func(d []Card) []Card {
+	return func(d []Card) []Card {
 		var ret []Card
-		for _, c := range d.Cards {
+		for _, c := range d {
 			if !f(c) {
 				ret = append(ret, c)
 			}
 		}
-		d.Cards = ret
+		d = ret
 		return d
 	}
 }
@@ -136,13 +132,13 @@ func Filter(f func(card Card) bool) func(d Deck) Deck {
 // AddDeck duplicates all current cards in the deck
 // run this after your first deck is sorted, filtered
 // with how many jokers you want before using this
-func AddDeck(toAdd int) func(Deck) Deck {
-	return func(d Deck) Deck {
+func AddDeck(toAdd int) func([]Card) []Card {
+	return func(d []Card) []Card {
 		var ret []Card
 		for i := 0; i < toAdd+1; i++ {
-			ret = append(ret, d.Cards...)
+			ret = append(ret, d...)
 		}
-		d.Cards = ret
+		d = ret
 		return d
 	}
 }
