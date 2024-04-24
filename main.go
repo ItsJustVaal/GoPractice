@@ -59,6 +59,7 @@ func Shuffle(gs GameState) GameState {
 
 func Deal(gs GameState) GameState {
 	ret := clone(gs)
+	// Hand is a []deck.Card
 	ret.Player = make(Hand, 0, 5)
 	ret.Dealer = make(Hand, 0, 5)
 	var card deck.Card
@@ -82,9 +83,7 @@ func Stand(gs GameState) GameState {
 func EndHand(gs GameState) GameState {
 	ret := clone(gs)
 	pScore, dScore := ret.Player.Score(), ret.Dealer.Score()
-	fmt.Println("==== Final Hands ====")
-	fmt.Printf("Player Hand: %s\nPlayer Score: %d\n", ret.Player, pScore)
-	fmt.Printf("Dealer Hand: %s\nDealer Score: %d\n", ret.Dealer, dScore)
+	fmt.Println()
 	switch {
 	case pScore > 21:
 		fmt.Println("You Busted")
@@ -97,6 +96,9 @@ func EndHand(gs GameState) GameState {
 	case dScore == pScore:
 		fmt.Println("Draw")
 	}
+	fmt.Println("==== Final Hands ====")
+	fmt.Printf("Player Hand: %s\nPlayer Score: %d\n", ret.Player, pScore)
+	fmt.Printf("Dealer Hand: %s\nDealer Score: %d\n", ret.Dealer, dScore)
 	fmt.Println()
 	ret.Player = nil
 	ret.Dealer = nil
@@ -113,6 +115,10 @@ func Hit(gs GameState) GameState {
 		return Stand(ret)
 	}
 	return ret
+}
+
+func New() Game {
+
 }
 
 func main() {
@@ -134,6 +140,10 @@ func main() {
 				gs = Hit(gs)
 			case "s":
 				gs = Stand(gs)
+			case "q":
+				fmt.Println()
+				fmt.Println("Successfully Quit")
+				return
 			default:
 				fmt.Println("Invalid Option")
 			}
