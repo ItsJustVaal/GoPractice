@@ -117,10 +117,6 @@ func Hit(gs GameState) GameState {
 	return ret
 }
 
-func New() Game {
-
-}
-
 func main() {
 	var gs GameState
 	gs = Shuffle(gs)
